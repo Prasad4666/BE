@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StudentData {
+    struct Student {
+        uint studentID;
+        string name;
+        uint age;
+    }
+
+    Student[] public students;
+
+    event StudentAdded(uint indexed studentID, string name, uint age);
+    event StudentUpdated(uint indexed studentID, string name, uint age);
+
+    // Fallback function (if Ether is sent to this contract, it will be rejected)
+    receive() external payable {
+        revert("This contract does not accept Ether.");
+    }
+
+    function addStudent(uint _studentID, string memory _name, uint _age) public {
+        students.push(Student(_studentID, _name, _age));
+        emit StudentAdded(_studentID, _name, _age);
+    }
+
+    function getStudent(uint _studentID) public view returns (uint, string memory, uint) {
+        for (uint i = 0; i < students.length; i++) {
+            if (students[i].studentID == _studentID) {
+                return (students[i].studentID, students[i].name, students[i].age);
+            }
+        }
+        revert("Student not found");
+    }
+
+    function updateStudent(uint _studentID, string memory _name, uint _age) public {
+        for (uint i = 0; i < students.length; i++) {
+            if (students[i].studentID == _studentID) {
+                students[i].name = _name;
+                students[i].age = _age;
+                emit StudentUpdated(_studentID, _name, _age);
+                return;
+            }
+        }
+        revert("Student not found");
+    }
+}
